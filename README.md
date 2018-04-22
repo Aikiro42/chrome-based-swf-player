@@ -1,4 +1,4 @@
-# chrome-based-swf-player
+# Chrome-based SWF Player
 An HTML file utilizing chrome's adobe flash player in order to bring back
 the easy opening of flash files.
 
