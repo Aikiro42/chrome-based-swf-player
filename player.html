@@ -16,14 +16,26 @@ document provides the
 	<head>
 		<title>SWF Player v2.0 Beta</title>
 		<style>
+			/*
+				-webkit-
+				-ms-
+				-moz-
+				-o-
+			*/
 			*{
 				margin: 0;
 				padding: 0;
+				transition: background 0.1s;
+				-webkit-transition: background 0.1s;
+				-ms-transition: background 0.1s;
+				-moz-transition: background 0.1s;
+				-o-transition: background 0.1s;
 			}
 						
 			body{
 				background: black;
 				font-family: "Segoe UI Light";
+				overflow: hidden;
 			}
 			
 			div.list{
@@ -110,7 +122,7 @@ document provides the
 				left: 0;
 				width: 100%;
 				height: 80%;
-				color: rgba(255,255,255,0.5);
+				color: rgb(255,255,255);
 				text-align: center;
 				vertical-align: middle;
 				overflow: hidden;
@@ -119,16 +131,18 @@ document provides the
 			div#nav_buttons{
 				position: absolute;
 				bottom: 0;
-				left: 0;
+				left: 50%;
+				transform: translate(-50%, 0);
 			}
 			
 			div.circle_button{
 				background: rgba(100,100,100,0.5);
+				position: relative;
 				color: white;
 				width: 50px;
 				height: 50px;
 				border-radius:25px;
-				text-align:center;
+				text-align: center;
 				line-height: 50px;
 				float: left;
 				margin: 10px;
@@ -136,8 +150,27 @@ document provides the
 				cursor: pointer;
 			}
 			
+			div.circle_button span.circle_button_tooltip{
+				width: max-content;
+				background: rgba(255,100,100,0.5);
+				padding: 0 20%;
+				position: absolute;
+				border-radius: 25px;
+				z-index: 1;
+			}
+			
 			div.circle_button:hover{
 				background: rgba(150,150,150,0.5);
+			}
+			
+			div.circle_button span#prev_tooltip{
+				text-align: right;
+				right: 105%;
+			}
+			
+			div.circle_button span#next_tooltip{
+				text-align: left;
+				left: 105%;
 			}
 			
 			div.circle_button:active{
@@ -170,26 +203,81 @@ document provides the
 				display: none;
 			}
 			
-			label.file_upload{
-				position: absolute;
-				right: 0;
-				bottom: 0;
-				margin: 1%;
+			p#swf_name{
+				padding: 0 1%;
+				width: max-content;
+				max-width: 40%;
 				background: rgba(100,100,100,0.5);
 				color: white;
+				border-bottom-left-radius: 10px;
+				border-bottom-right-radius: 10px;
+				text-align:center;
+				cursor: default;
+				position: absolute;
+				z-index: 3;
+				left: 50%;
+				transform: translate(-50%, 0);
+				
+				transition: padding 0.1s, color 0.1s;
+				-webkit-transition: padding 0.1s, color 0.1s;
+				-moz-transition: padding 0.1s, color 0.1s;
+				-o-transition: padding 0.1s, color 0.1s;
+				-ms-transition: padding 0.1s, color 0.1s;
+			}
+			
+			p#swf_name:hover{
+				padding: 1%;
+				background: rgba(255,255,255,1);
+				color: black;
+				font-weight: bold;
+			}
+			
+			div#hide_ui{
+				position: absolute;
+				width: 100px;
+				height: 100px;
+				background: rgba(255,100,100, 0.5);
+				bottom: 0;
+				left: 0;
+				border-radius: 50px;
 				cursor: pointer;
+				transform: translate(-50%,50%);
+				transition: width 0.1s, height 0.1s, border-radius 0.1s;
+				-webkit-transition: width 0.1s, height 0.1s, border-radius 0.1s;
+				-moz-transition: width 0.1s, height 0.1s, border-radius 0.1s;
+				-o-transition: width 0.1s, height 0.1s, border-radius 0.1s;
+				-ms-transition: width 0.1s, height 0.1s, border-radius 0.1s;	
+			}
+			
+			div#hide_ui span#hide_ui_tooltip{
+				visibility: hidden;
+				width: max-content;
+				background: rgba(100,100,100,0.5);
+				color: white;
+				border-radius: 5px;
+				position: absolute;
+				z-index: 1;
+				padding: 10%;
 				text-align: center;
-				padding: 2%;
-				border-radius: 25px;
+				bottom: 100%;
+				left: 100%;
 			}
 			
-			label.file_upload:hover{
-				background: rgba(150,150,150,0.5);
+			div#hide_ui:hover{
+				width: 150px;
+				height: 150px;
+				border-radius: 75px;
 			}
 			
-			label.file_upload:active{
+			div#hide_ui:hover span#hide_ui_tooltip{
+				visibility: visible;
+			}
+			
+			div#hide_ui:active{
 				opacity: 0.5;
 			}
+			
+			
 		</style>
 		<!--It would be very inconvenient if I were to release the file with the jQuery .js file.-->
 		<script>/*! jQuery v3.3.1 | (c) JS Foundation and other contributors | jquery.org/license */
@@ -204,6 +292,10 @@ document provides the
 			<ul class="true_list" id="recent_list">
 			</ul>
 		</div>
+		
+		<p id="swf_name">Drag a flash file on the screen to get started!</p>	
+		
+		
 		<div class="list" id="res_list">
 			<p  class="list_title">Resolutions</p>
 			<ul class="true_list" id="resolution_list">
@@ -248,7 +340,7 @@ document provides the
 		
 		<object id="theParent">
 			<embed style="visibility: hidden;" id="theChild" src="" />
-			<p id="message" style="opacity: 0.5;">
+			<p id="message" style="opacity: 1;">
 				<span style="font-family: 'Consolas'; word-spacing: .25em; letter-spacing: 0.125em;">( It is recommended that you use this utility while the browser is <strong style="color: rgb(255,100,100);">maximized</strong> or in <strong style="color: rgb(255,100,100);">fullscreen</strong>. )</span>
 				<br /><br />
 				<span style="font-weight: bold; font-size: 2em; color: rgb(255,100,100);">Instructions</span>
@@ -264,15 +356,23 @@ document provides the
 				You can change the resolution to suit your computer's capability.<br />
 				Select a resolution from the list that will drop down when the top-right part of the screen is clicked.
 				<br /><br />
-				You can also cycle through the flash files you've opened by using the buttons on the lower-left part of the screen.
+				You can also cycle through the flash files you've opened by using the buttons on the lower part of the screen.
 				<br />Otherwise you can manually navigate to the flash file you wish to play by navigating the list accessed by the top-right part of the screen.
 				
 			</p>
 		</object>
 		
 		<div id="nav_buttons">
-			<div class="circle_button" id="prev" title="Open the previous flash file opened."><</div>
-			<div class="circle_button" id="next" title="Play the later flash file opened after this.">></div>
+			<div class="circle_button" id="prev"><
+				<span class="circle_button_tooltip" id="prev_tooltip">Drag a flash file on the screen to get started!</span>
+			</div>
+			<div class="circle_button" id="next">>
+				<span class="circle_button_tooltip" id="next_tooltip">Drag a flash file on the screen to get started!</span>
+			</div>
+		</div>
+		
+		<div id="hide_ui">
+			<span id="hide_ui_tooltip">Hide UI</span>
 		</div>
 		
 		<!--I have to improve the performance of this thing.-->
@@ -288,6 +388,38 @@ document provides the
 		Global variable used to access the recently opened files with the nav buttons on the lower-left corner of the screen.
 		*/
 		var currentIndex = 0;
+		var currentWidth = "100%";
+		var currentHeight = "100%";
+		
+		function setCircleToolTip(){
+			nextIndex = currentIndex - 1;
+			prevIndex = currentIndex + 1;
+			
+			$("span#prev_tooltip").html('No earlier file to open.');
+			$("span#next_tooltip").html('No later file to open.');
+
+			
+			var nextLi = $("li#rec_item")[nextIndex];
+			var prevLi = $("li#rec_item")[prevIndex];
+			
+			if(nextLi != null){
+				console.log("Next:" + $("li#rec_item")[nextIndex].innerHTML);
+				$("span#next_tooltip").html($("li#rec_item")[nextIndex].innerHTML);
+			}else{
+				console.log("next is null");
+			}
+			if(prevLi != null){
+				$("span#prev_tooltip").html($("li#rec_item")[prevIndex].innerHTML);
+			}else{
+				console.log("prev is null");
+			}
+		}
+		
+		function setNameLabel(){
+			console.log("Editing name innerHTML...");
+			$("p#swf_name").html($("li#rec_item")[currentIndex].innerHTML);
+			console.log("Edited name innerHTML.")
+		}
 		
 		/**
 		Returns the extension of the provided file name. It does this by returning the string after the dot. Example: "file.txt" returns "txt".
@@ -296,6 +428,23 @@ document provides the
 			var x = filename.split('.').pop();
 			console.log(x);
 			return x;
+		}
+		
+		$("div#hide_ui").click(function(){
+			hideUI();
+		});
+		
+		function hideUI(){
+			$("div.list").fadeToggle(100);
+			$("p#swf_name").fadeToggle(100);
+			$("div#nav_buttons").fadeToggle(100);
+				console.log("boiiiiiii");
+			if($("span#hide_ui_tooltip").html() == "Hide UI"){
+				$("span#hide_ui_tooltip").html("Show UI");
+				console.log("boiiiiiii");
+			}else{
+				$("span#hide_ui_tooltip").html("Hide UI");
+			}
 		}
 		
 		/**
@@ -378,10 +527,13 @@ document provides the
 		}
 		
 		function loadSWF(fileName, element){
+			currentIndex=0;
 			loadSWFcore(fileName);
 			if(element != null){
 				document.getElementById("recent_list").removeChild(element);
 			}
+			setCircleToolTip();
+			setNameLabel();
 		}
 		
 		/**
@@ -401,8 +553,8 @@ document provides the
 			
 			parent.appendChild(child);
 			updateNavlist(fileName);
-			//var playin = document.getElementById("playing");
-			//playin.innerHTML = playing;
+			setCircleToolTip();
+			setNameLabel();
 		}
 		
 		/**
@@ -440,6 +592,14 @@ document provides the
 			Slides up all lists for aesthetic purposses.
 			*/
 			$("div.list ul").slideUp(0);
+			$("span.circle_button_tooltip").fadeOut(0);
+			
+			$("div.circle_button").hover(function(){
+				$(this).find("span.circle_button_tooltip").fadeIn(100);
+			},function(){
+				$(this).find("span.circle_button_tooltip").fadeOut(100);
+			});
+			
 			
 			/**
 			Slides the resolution and the recent lists up and down when clicked on.
@@ -477,10 +637,11 @@ document provides the
 			$("div#prev").click(function(){
 				var stackSize = $("li#rec_item").length;
 				if(stackSize > 0){
-					if(currentIndex < stackSize){
+					if(currentIndex < stackSize - 1){
 						currentIndex++;
-						loadSWF_controlled($("li#rec_item")[currentIndex].innerHTML, false);
+						loadSWF_currentDimensions($("li#rec_item")[currentIndex].innerHTML, false);
 					}
+					setCircleToolTip();
 				}else{
 					error_no_recently_opened_file();
 				}
@@ -494,8 +655,9 @@ document provides the
 				if(stackSize > 0){
 					if(currentIndex > 0){
 						currentIndex--;
-						loadSWF_controlled($("li#rec_item")[currentIndex].innerHTML, false);
+						loadSWF_currentDimensions($("li#rec_item")[currentIndex].innerHTML, false);
 					}
+					setCircleToolTip();
 				}else{
 					error_no_recently_opened_file();
 				}
@@ -507,7 +669,8 @@ document provides the
 			$("li#res_item").click(function(){
 				var w = $(this).find("span#width").text() + "px";
 				var h = $(this).find("span#height").text() + "px";
-				
+				currentWidth = w;
+				currentHeight = h;
 				loadSWF_setSize($("embed").attr("src"), w, h);
 			
 			});
@@ -516,6 +679,8 @@ document provides the
 				Reloads the SWF in a new defaultly-css'ed <embed> element.
 			*/
 			$("#autosize").click(function(){
+				currentWidth = "100%";
+				currentHeight = "100%";
 				loadSWF_controlled($("embed").attr("src"), false);
 			});
 			
@@ -565,7 +730,9 @@ document provides the
 				
 				if(willUpdateList){
 					updateNavlist(fileName);
-				}			
+				}
+				setCircleToolTip();
+				setNameLabel();
 			}
 			
 			function loadSWF_setSize(fileName, width, height){
@@ -580,10 +747,15 @@ document provides the
 				loadSWF_core(fileName, "100%", "100%", willUpdateList, false);
 			}
 			
+			function loadSWF_currentDimensions(fileName, willUpdateList){
+				if(currentWidth == "100%" && currentHeight == "100%"){
+					loadSWF_core(fileName, currentWidth, currentHeight, willUpdateList, false);
+				}else{
+					loadSWF_core(fileName, currentWidth, currentHeight, willUpdateList, true);	
+				}
+			}
 			
 		});
-		
-		
 		
 		</script>
 	</body>
