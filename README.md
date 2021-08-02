@@ -1,3 +1,11 @@
+> Why are you guys still forking this? I don't think this works anymore
+> (except maybe for old browser builds) as all browsers dropped flash support.
+> 
+> This thing was made with the browser's built-in flash player in mind,
+> so now that flash is dead this won't work in today's browsers.
+> 
+> I'll try and look for the legacy flash executables for you guys and I'll post the link here, if it's allowed.
+
 # Chrome-based SWF Player
 An HTML file utilizing chrome's adobe flash player in order to bring back
 the easy opening of flash files.
